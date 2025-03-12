@@ -1,6 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function TransactionForm() {
   const {
@@ -11,6 +11,23 @@ export default function TransactionForm() {
   } = useForm();
 
   const [serverError, setServerError] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  // Fetch categories from API
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/categories");
+        if (!res.ok) throw new Error("Failed to load categories");
+        const data = await res.json();
+        setCategories(data);
+      } catch (error) {
+        console.error(error);
+        setServerError("Failed to load categories.");
+      }
+    }
+    fetchCategories();
+  }, []);
 
   async function onSubmit(data) {
     setServerError("");
@@ -30,72 +47,99 @@ export default function TransactionForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-[400px]">
-      <fieldset className="fieldset w-full bg-base-200 border border-base-300 p-6 rounded-box">
-        <legend className="fieldset-legend text-lg font-semibold">
-          Add Transaction
-        </legend>
+    <div className="max-w-xl mx-auto p-4 bg-white shadow-lg rounded-lg">
+      {/* Form Header */}
+      <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+        Add a New Transaction
+      </h2>
 
-        {/* Server Error Message */}
-        {serverError && <p className="text-red-500 mb-2">{serverError}</p>}
+      {/* Transaction Form */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        {serverError && (
+          <p className="text-red-500 text-center">{serverError}</p>
+        )}
 
         {/* Amount Field */}
-        <label className="fieldset-label">Amount</label>
-        <input
-          {...register("amount", {
-            required: "Amount is required",
-            min: { value: 1, message: "Amount must be a positive number" },
-            pattern: {
-              value: /^[0-9]+$/,
-              message: "Amount must be a valid number",
-            },
-          })}
-          type="number"
-          placeholder="Amount"
-          className="input w-full mb-2"
-        />
+        <div className="grid grid-cols-2  items-center">
+          <label className="text-gray-700 font-medium">Amount (₹)</label>
+          <input
+            {...register("amount", {
+              required: "Amount is required",
+              min: { value: 1, message: "Amount must be a positive number" },
+              pattern: { value: /^[0-9]+$/, message: "Invalid number" },
+            })}
+            type="number"
+            placeholder="Enter amount"
+            className="input border p-0.5 rounded w-full"
+          />
+        </div>
         {errors.amount && (
           <p className="text-red-500 text-sm">{errors.amount.message}</p>
         )}
 
         {/* Date Field */}
-        <label className="fieldset-label">Date</label>
-        <input
-          {...register("date", { required: "Date is required" })}
-          type="date"
-          className="input w-full mb-2"
-        />
+        <div className="grid grid-cols-2  items-center">
+          <label className="text-gray-700 font-medium">Date</label>
+          <input
+            {...register("date", { required: "Date is required" })}
+            type="date"
+            className="input border p-0.5 rounded w-full"
+          />
+        </div>
         {errors.date && (
           <p className="text-red-500 text-sm">{errors.date.message}</p>
         )}
 
         {/* Description Field */}
-        <label className="fieldset-label">Description</label>
-        <input
-          {...register("description", {
-            required: "Description is required",
-            minLength: {
-              value: 3,
-              message: "Description must be at least 3 characters",
-            },
-          })}
-          type="text"
-          placeholder="Description"
-          className="input w-full mb-2"
-        />
+        <div className="grid grid-cols-2  items-center">
+          <label className="text-gray-700 font-medium">Description</label>
+          <input
+            {...register("description", {
+              required: "Description is required",
+              minLength: {
+                value: 3,
+                message: "At least 3 characters required",
+              },
+            })}
+            type="text"
+            placeholder="Enter description"
+            className="input border p-0.5 rounded w-full"
+          />
+        </div>
         {errors.description && (
           <p className="text-red-500 text-sm">{errors.description.message}</p>
         )}
 
+        {/* Category Field */}
+        <div className="grid grid-cols-2  items-center">
+          <label className="text-gray-700 font-medium">Category</label>
+          <select
+            {...register("category", { required: "Category is required" })}
+            className="input border p-0.5 rounded w-full"
+          >
+            <option value="">Select category</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {errors.category && (
+          <p className="text-red-500 text-sm">{errors.category.message}</p>
+        )}
+
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="btn btn-neutral mt-4 w-full"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Adding..." : "Add Transaction"}
-        </button>
-      </fieldset>
-    </form>
+        <div className="text-center">
+          <button
+            type="submit"
+            className="btn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Adding..." : "Add Transaction"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

@@ -5,8 +5,8 @@ import TransactionList from "../../../components/TransactionList";
 export default function TransactionsPage() {
   return (
     <div className="flex w-full h-[calc(100vh-4rem)] pt-16">
-      {/* Left Side - Background Image with Centered Form */}
-      <div className="relative w-1/2 h-full flex items-center justify-center">
+      {/* Left Side - Background Image with Centered Form (60% Width) */}
+      <div className="relative w-[60%] h-full flex items-center justify-center">
         {/* Background Image */}
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center"
@@ -16,16 +16,13 @@ export default function TransactionsPage() {
           }}
         />
         {/* Centered Form with Overlay */}
-        <div className="relative bg-white bg-opacity-80 p-8 rounded-lg w-[75%] max-w-[400px] shadow-lg z-10">
+        <div className="relative bg-transparent bg-opacity-85 p-8 rounded-lg w-auto max-w-[450px] shadow-lg z-10">
           <TransactionForm />
         </div>
       </div>
 
-      {/* Right Side - Full Height Transaction List */}
-      <div className="w-1/2 h-full p-6 bg-white flex flex-col shadow-lg">
-        <h2 className="text-lg font-semibold mb-4 text-center">
-          Transaction List
-        </h2>
+      {/* Right Side - Transaction List (40% Width) */}
+      <div className="w-[80%] h-full p-6 bg-white flex flex-col shadow-lg">
         <div className="flex-grow overflow-y-auto">
           <TransactionList />
         </div>

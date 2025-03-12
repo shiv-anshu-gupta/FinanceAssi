@@ -5,7 +5,7 @@ const Navbar = ({ setSelect }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-base-100 shadow-sm fixed top-0 left-0 w-full z-50 flex items-center px-6 py-3">
+    <nav className="bg-base-100 shadow-sm fixed top-0 left-0 w-full z-50 flex items-center px-6 py-3 text-[#245a28]">
       <div className="flex items-center">
         <button
           onClick={() => setSelect("dashboard")}
@@ -23,13 +23,13 @@ const Navbar = ({ setSelect }) => {
         {/* ✅ Change Link to button to update state */}
         <button
           onClick={() => setSelect("dashboard")}
-          className="text-base font-medium text-gray-600 hover:text-green-500"
+          className="text-base font-medium  hover:text-green-500"
         >
           Dashboard
         </button>
         <button
           onClick={() => setSelect("transactions")}
-          className="text-base font-medium text-gray-600 hover:text-green-500"
+          className="text-base font-medium  hover:text-green-500"
         >
           Transactions
         </button>
