@@ -32,30 +32,41 @@ export default function ExpensesChart() {
 
   useEffect(() => {
     async function fetchData() {
-      const res = await fetch("/api/transactions");
-      const transactions = await res.json();
+      try {
+        const res = await fetch("/api/transactions");
+        const data = await res.json();
 
-      // Create an object with all months initialized to 0
-      const monthlyData = allMonths.reduce((acc, month) => {
-        acc[month] = 0;
-        return acc;
-      }, {});
+        // Check if data is an array
+        const transactions = Array.isArray(data) ? data : [];
 
-      // Fill in actual transaction amounts
-      transactions.forEach((tx) => {
-        const month = new Date(tx.date).toLocaleString("default", {
-          month: "short",
+        // Create an object with all months initialized to 0
+        const monthlyData = allMonths.reduce((acc, month) => {
+          acc[month] = 0;
+          return acc;
+        }, {});
+
+        // Fill in actual transaction amounts
+        transactions.forEach((tx) => {
+          if (tx.date) {
+            const month = new Date(tx.date).toLocaleString("default", {
+              month: "short",
+            });
+            if (monthlyData[month] !== undefined) {
+              monthlyData[month] += tx.amount;
+            }
+          }
         });
-        monthlyData[month] += tx.amount;
-      });
 
-      // Convert to an array sorted correctly
-      setChartData(
-        allMonths.map((month) => ({
-          month,
-          amount: monthlyData[month],
-        }))
-      );
+        // Convert to an array sorted correctly
+        setChartData(
+          allMonths.map((month) => ({
+            month,
+            amount: monthlyData[month],
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
     }
     fetchData();
   }, []);
