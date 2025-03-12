@@ -1,8 +1,12 @@
-import Navbar from "../../../components/Navbar";
+import { useState } from "react";
+
 import TransactionForm from "../../../components/TransactionForm";
+import BudgetForm from "../../../components/BudgetForm";
 import TransactionList from "../../../components/TransactionList";
 
 export default function TransactionsPage() {
+  const [activeForm, setActiveForm] = useState("transaction"); // "transaction" or "budget"
+
   return (
     <div className="flex w-full h-[calc(100vh-4rem)] pt-16">
       {/* Left Side - Background Image with Centered Form (60% Width) */}
@@ -15,9 +19,35 @@ export default function TransactionsPage() {
               "url('https://cdn.pixabay.com/photo/2014/07/06/13/55/calculator-385506_640.jpg')",
           }}
         />
+
         {/* Centered Form with Overlay */}
-        <div className="relative bg-transparent bg-opacity-85 p-8 rounded-lg w-auto max-w-[450px] shadow-lg z-10">
-          <TransactionForm />
+        <div className="relative bg-white bg-opacity-90 p-8 rounded-lg w-auto max-w-[450px] shadow-lg z-10">
+          {/* Toggle Buttons */}
+          <div className="flex justify-center gap-4 mb-4">
+            <button
+              className={`px-4 py-2 rounded ${
+                activeForm === "transaction"
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-300"
+              }`}
+              onClick={() => setActiveForm("transaction")}
+            >
+              Add Transaction
+            </button>
+            <button
+              className={`px-4 py-2 rounded ${
+                activeForm === "budget"
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-300"
+              }`}
+              onClick={() => setActiveForm("budget")}
+            >
+              Set Budget
+            </button>
+          </div>
+
+          {/* Render Forms Based on Selection */}
+          {activeForm === "transaction" ? <TransactionForm /> : <BudgetForm />}
         </div>
       </div>
 

@@ -5,7 +5,6 @@ import { Category } from "../models/categoryModel";
 export async function GET(req) {
   try {
     await connectDB();
-
     const url = new URL(req.url);
     const isSummary = url.searchParams.get("summary");
 
@@ -26,7 +25,7 @@ export async function GET(req) {
         },
         {
           $lookup: {
-            from: "categories", // Ensure this matches MongoDB collection name
+            from: "categories",
             localField: "_id",
             foreignField: "_id",
             as: "categoryDetails",
@@ -35,13 +34,15 @@ export async function GET(req) {
         {
           $unwind: {
             path: "$categoryDetails",
-            preserveNullAndEmptyArrays: true,
+            preserveNullAndEmptyArrays: true, // Ensures transactions without categories are included
           },
         },
         {
           $project: {
             _id: 0,
-            category: "$categoryDetails.name",
+            category: {
+              $ifNull: ["$categoryDetails.name", "Unknown Category"],
+            }, // Handle missing categories
             totalAmount: 1,
           },
         },
@@ -51,7 +52,8 @@ export async function GET(req) {
       const recentTransactions = await Transaction.find()
         .sort({ date: -1 })
         .limit(5)
-        .populate("category", "name");
+        .populate({ path: "category", select: "name" }) // Ensure category is populated
+        .lean(); // Convert Mongoose objects to plain JS
 
       return Response.json({
         totalExpenses,
@@ -60,20 +62,17 @@ export async function GET(req) {
       });
     }
 
-    // Default: Fetch all transactions
+    // Fetch all transactions with category populated
     const transactions = await Transaction.find()
       .sort({ date: -1 })
-      .populate("category", "name");
+      .populate({ path: "category", select: "name" })
+      .lean(); // Convert to plain JS objects
 
-    return Response.json(transactions.length ? transactions : []);
+    return Response.json(transactions);
   } catch (error) {
     console.error("❌ GET /api/transactions Error:", error);
     return Response.json(
-      {
-        error: "Failed to fetch transactions",
-        categorySummary: [],
-        recentTransactions: [],
-      },
+      { error: "Failed to fetch transactions" },
       { status: 500 }
     );
   }
@@ -87,6 +86,15 @@ export async function POST(req) {
     if (!amount || !date || !description || !category) {
       return Response.json(
         { error: "All fields are required!" },
+        { status: 400 }
+      );
+    }
+
+    // Validate category before creating transaction
+    const categoryExists = await Category.findById(category);
+    if (!categoryExists) {
+      return Response.json(
+        { error: "Invalid category ID. Category not found." },
         { status: 400 }
       );
     }
