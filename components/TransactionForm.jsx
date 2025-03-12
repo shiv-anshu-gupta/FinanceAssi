@@ -133,7 +133,7 @@ export default function TransactionForm() {
         <div className="text-center">
           <button
             type="submit"
-            className="btn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all"
+            className="btn bg-[#245a28] text-white px-4 py-2 rounded hover:bg-green-500 transition-all"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Adding..." : "Add Transaction"}
