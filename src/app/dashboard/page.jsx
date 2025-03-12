@@ -4,7 +4,7 @@ import CategoryPieChart from "../../../components/CategoryPieChart";
 
 export default function Dashboard() {
   return (
-    <div className="mt-16 p-6">
+    <div className="mt-10 p-8">
       <h1
         className="text-2xl font-bold mb-6 text-center"
         style={{ color: "#245a28" }}

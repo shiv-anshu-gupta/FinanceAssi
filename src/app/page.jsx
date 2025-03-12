@@ -8,7 +8,7 @@ export default function Home() {
   const [select, setSelect] = useState("dashboard");
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex flex-col w-full h-full bg-gray-100">
       <Navbar setSelect={setSelect} />
       {/* Removed pt-16 here to prevent unnecessary spacing */}
       {select === "dashboard" ? <Dashboard /> : <TransactionsPage />}
